@@ -1,0 +1,86 @@
+-> Docker Images: 
+1. Images are read only templates used to create containers.
+2. Image are created with the docker build command, either by us or by other docker users.
+3. Images are composed of layers of other images.
+4. Images are stored in a Docker registry.
+
+-> Docker Containers:
+1. If and image is a  class, then a container is an instance of that class - a runtime object.
+2. Containers are lightweight and portable encapsulations of  an environment to run applications.
+3. Containers are created from images. Inside a container, it has all the binaries and dependencies needed to run the application.
+
+-> Registries and Repositories:
+1. A registry is where we store our images.
+2. You can host your own registry, or you can use Docker's public registry which is called DockerHub.
+3. Inside a registry, images are stored in repositories.
+4. Docker repository is a collection of different tags, each tag usually represents a different version of the image.
+
+-> To find out what images you have in your local box, we can run the 'docker images' command.
+
+-> To delete images we use 'docker rmi <image_name:tag_name|image_id>' command to delete images with no containers.
+
+-> In case there are stopped containers we can use 'docker container prune' command to delete/remove all of the stopped containers. To delete a specific container use 'docker rm <container_id>' command.
+
+-> DOCKER RUN:
+1. To run a container we use 'docker run <image-name>:<tag>' command. 'docker run' command will create the container using the image we specified then spin up the container and run it.
+2. If the image is not present on your local box then first it will download the image from the registry and then will spin up the container.
+3. Since a continer itself is a mini OS running on docker we can enter inside a docker container and can check its contents and configurations from the inside using 'docker run -i -t <image-name>:<tag>'
+    3.1 The -i flag starts an interactive container.
+    3.2 The -t flag creates a pseudo-TTY that attaches stdin & stdout.
+4. 'docker run' always spins up a new container by adding a -d option the container can run in 'detached mode'. Here the 'detached mode' allows use to run a container in 'background' while we can work on other important task.
+5. Once the container completes its process, the containder is stopped and it remains stopped/inactive.
+6. If we want the docker deamon to automatically remove the container once it exits we can use '--rm' option. 'docker run --rm <image-name>:<tag>'.
+7. We can also specify a customer name of the docker container we want to run like 'docker run --name <name-of-container> <image-name>:<tag>'. Otherwise docker will automatically assign a random name to the container started using 'docker run' command.
+8. We can expose or map a container port to host port using '-p' option like 'docker run -p <host-port>:<container-port> <image-name>:<tag>'
+ 
+-> To find list of all the currently running containers use 'docker ps' command. '-a' option will list all continers including the stopped/inactive containers.
+
+-> To get a 'low-level' information of a container or an image we use command 'docker inspect <container-id|image-id>'.
+
+-> DOCKER IMAGE LAYERS
+1. A docker image is made up of a list of read only layers that represent file system differences. Image layers are stacked on top of each other to form a base for the "Containers" file system.
+2. Each image can consists multiple layers and each layer is just another image. The image below is called the 'Parent Image' & the image at the bottom is called the 'Base Image'.
+3. When ever docker pulls an image it pulls the image layer by layer.
+4. Whenever a new image is created a new 'writable' continer layer is added on top of the underlying stack of layers.All changes made to the running container, such as writing, modifying or deleting files are written to this 'writable' continer layer.
+4. When the container is deleted, the writable layer is also deleted, but the underlying image remains unchanged.
+5. Each running container has its own 'writable' continer layer & all the changes are stored in this layer. Multiple containers can share access to the same underlying image(s) and yet have their own data state.
+
+-> CREATE DOCKER IMAGES:
+1. We can build a docker images in two ways: 
+    1.1 Commit the changes made in docker container.
+        1.1.1 Spin up a container from the base image.
+        1.1.2 Install git package in the container.
+        1.1.3 Commit changes made in the container by using 'docker commit' command. Docker commit command will save the changes we made to the docker container's file system to a new image.
+            'docker commit <container_ID> <repository_name>:<tag>' 
+    1.2 Write a Dockerfile.
+        1.2.1 A docker file is a text document that contains all the instructions users provide to assemble and image.
+        1.2.2 Each instruction will create a new image layer to the image. Instruction specify what to do when building and image.
+        1.2.3 A docker file must not have any extension it should be named 'Dockerfile'.
+        1.2.4 This Dockerfile can be used to create a new image unsing the 'DOCKER BUILD' command. 
+
+-> DOCKER BUILD
+1. Docker build will build a docker image using the instruction provided in the Dockerfile.
+2. Docker build command takes the path to the build context as an argument.
+3. When build starts docker client will pack all the files in the build context into a tarball then transfer the tarball file to the deamon.
+4. By default, docker would search for the Dockerfile in the build context path. If the Dockerfile doesn't live in the build context path then you can tell docker to search for a different file by providing a '-f' option.
+5. Syntax: 'docker build -t <tag_name> -f <Dockerfile_path> .'
+
+-> DOCKER CACHE
+1. Each time Docker exexutes an instruction it builds a new image layer.
+2. The next time if the instruction doesn't change, Docker will simply reuse the existing layer.
+3. Which helps to greatly reduce build time and creates builds in less time.
+4. To invalidate cache while building an image add a --no-cache=true option with the 'Docker build' command like 'docker build -t <tag_name> -f <Dockerfile_path> . --no-cache=true'
+
+-> DOCKER(latest) TAG
+1. Docker will use the latest as default tag when no tag is provided.
+2. Images which are tagged latest will not be updated automatically when a newer version of the image is pushed to the repository, so it is advisible to avoid using 'latest' tag.
+3. We can change tag of an image by using 'docker tag' command like 
+    'docker tag <parent_image_id> <image_name>:<new_tag:name>'
+
+    
+-> DOCKER EXEC
+Docker exec allows you to run a command in a running container. The syntax of command is :
+    'docker exec [OPTIONS] <CONTAINER_ID> <COMMAND> [ARG...]'
+
+For example runnning and connecting to a docker container via bash in interactive mode, we do:
+    'docker exec -t <CONTAINER_ID> bash'

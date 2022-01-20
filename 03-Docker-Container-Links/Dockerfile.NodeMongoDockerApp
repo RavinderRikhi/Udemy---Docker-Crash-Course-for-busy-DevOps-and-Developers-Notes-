@@ -1,0 +1,21 @@
+# base docker image with already installed node 16.13.2->requirement
+FROM node:16.13.2-bullseye-slim
+# add a new user admin
+RUN useradd -ms /bin/bash admin
+# set the user as admin since the default user is 'root' which is a security concern
+USER admin
+# set the working directory where the code will reside and easy to 
+WORKDIR /NodeMongoDockerApp
+# Copy app code from NodeMongoDockerApp to /NodeMongoDockerApp
+COPY NodeMongoDockerApp /NodeMongoDockerApp
+# install node packages from package.json and run 
+RUN npm set unsafe-perm true \
+    && npm ci --only=prod 
+# run the application using the entrypoint index.js when the container is created
+CMD [ "node", "index.js", "--app-port=8888", "--db-url=mongo", "--db-name=Users" ]
+
+# Use `docker build -t nodemongodockerapp:v0.1 -f Dockerfile.NodeMongoDockerApp .` command to build the image of the app using the DockerFile 'Dockerfile.NodeMongoDockerApp' with image name set to 'nodemongodockerapp' and tag to 'v0.1'.
+
+# After the image is created run 'docker run -d -p 8888:<HOST_PORT> --link mongo nodemongodockerapp:v0.1' to create and run container from this image in the background. will map the continer machine port 8088 to the host machine port HOST_PORT which will be used to access the app outside the container. Also note we are using --link option to link this container with the container name 'mongo' which will be used to link the app container with an already running docker container named 'mongo' which will allow containers to discover each other & securly transfer information from one container to another without even exposing & mapping their ports.
+
+# CMD command will run the `node index.js --app-port=8888 --db-url=mongo --db-name=Users"` command from inside the container which will create and run the app on port 8088 as described in the process argument '--app-port'. Note that we pass in '--db-url' as 'mongo' which will be used to establish connection with the container named 'mongo' which we linked with this container with the command above.

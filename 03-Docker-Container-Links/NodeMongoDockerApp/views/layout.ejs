@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node Docker App</title>
+</head>
+<body>
+    <div style="display: <%= message === null ? 'hidden' : 'block' %>;">
+        <h3><%= message %></h3>
+    </div>
+    <div style="padding: 1rem;">
+        <h4>Save Data</h4>
+        <FORM method="post" action="/data">
+            <P>
+                <LABEL for="firstname">First name: </LABEL>
+                        <INPUT type="text" id="firstname" name="firstname" required><BR>
+                <LABEL for="lastname">Last name: </LABEL>
+                        <INPUT type="text" id="lastname" name="lastname" required><BR>
+                <LABEL for="email">email: </LABEL>
+                        <INPUT type="text" id="email" name="email" required><BR>
+                <INPUT type="submit" value="Save"/>
+            </P>
+        </FORM>
+    </div>
+
+    <div style="padding: 1rem;">
+        <h4>Fetch Data</h4>
+        <FORM method="get" action="/data">
+            <p>
+                <LABEL for="firstname">First name: </LABEL>
+                        <INPUT type="text" id="firstname" name="firstname" required><BR>
+                <INPUT type="submit" value="Get"/>
+            </p>
+        </FORM>
+        <div style="display: <%= (data && Array.isArray(data) && data.length) ? 'block' : 'hidden' %>;">
+            <ul style="padding: 1rem;">
+                <% data && data.forEach(function(user){ %>
+                    <li>Firstname: <%= user.firstname %>. Lastname: <%= user.lastname %>. Email: <%= user.email %> </li>
+                <%  }); %>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

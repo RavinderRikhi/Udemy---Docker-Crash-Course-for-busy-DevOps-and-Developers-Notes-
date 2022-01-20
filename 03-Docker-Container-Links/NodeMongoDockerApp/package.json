@@ -1,0 +1,25 @@
+{
+  "name": "nodedockerapp",
+  "version": "1.0.0",
+  "description": "Node app with html and hosting controller connected to MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "develop": "node index.js --app-port=8080 --db-url=192.168.210.100 --db-port=27017 --db-name=Users"
+  },
+  "keywords": [
+    "docker",
+    "node",
+    "mongo",
+    "boilerplate",
+    "parctice"
+  ],
+  "author": "Ravinder Rikhi",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^8.3.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "mongodb": "^4.3.1"
+  }
+}

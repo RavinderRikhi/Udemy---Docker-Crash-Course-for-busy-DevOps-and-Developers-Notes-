@@ -1,0 +1,32 @@
+# Set docker compose version using 'version'
+version: '3'
+# services make up the complete application.
+# for each service we provide instruction on how to build & run the container 
+# our application has 2 services 1.Node Mongo Docker app & 2. Mongo db service
+services:
+  nodemongodockerapp:
+    # The 'build' instruction defines the path to the docker file which will be used to build the docker-app image
+    # Since our 'nodemongodockerapp' Dockerfile i.e. 'Dockerfile.NodeMongoDockerApp' is sitting in the same directory as our docker-compose.yaml file we put  '.' which means the current directory 
+    build: 
+      context: .
+      dockerfile: Dockerfile.NodeMongoDockerApp
+    # The 'ports' instruction which defines which port in the container to expose to the external network 
+    # This instruction is analogous to the -p instruction of the docker-run command
+    # The Symantic for this is <HOST_PORT>:<CONTAINER_PORT> 
+    ports:
+      - "8888:8888"
+    # The 'depends_on' instruction is used to describe the dependency of the service we are currently describing because in a micro service based architecture we want the services to start in the right order so that the app can work perfectly . Which in our case is mongo because we want the mongo container to start before the 'nodemongodockerapp' container.
+    # docker-compose will start the services in the dependency order decribed in the 'depends_on' section
+    depends_on:
+      - mongo
+  # Now we define the 'mongo' service which is created from the image pulled from the docker hub 
+  mongo:
+    # The 'image' instruction defines which image to run a container from
+    # So we have 2 options here 1. We can build an image from a Dockerfile. 2. Run a container using an existing image
+    image:
+      mongo:4.4.12-rc1
+    # We want to connect the mongo container with our mongo client software then we need to export the ports of this service to the external network.
+    ports:
+      - "27017:27017"
+
+# The version 2 or above docker-compose format supports 'Docker network' feature which containers to be discovered by its name 'automatically' & any service can reach any other service using the service's name so linking is not required any more

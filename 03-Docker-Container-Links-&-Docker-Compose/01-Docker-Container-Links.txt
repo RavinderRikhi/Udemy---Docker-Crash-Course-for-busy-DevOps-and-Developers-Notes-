@@ -1,0 +1,17 @@
+-> DOCKER CONTAINER LINKS:
+1. Docker container links allow containers to discover each other & securly transfer information from one container to another.  
+2. When you setup a link you can create a conduit between a source container and a recipient container. The recipient can then access select data from the source.
+3. The links are established using container names.
+
+-> LINK DOCKER CONTAINERS:
+1. For linking 2 or more containers you need to first name your recipient continers with --name option so that it is easier for the recipient container to link with the source container. For example we are crating a container with the image name 'mongo' & tag '4.4.12-rc1', with the name 'mongo' using following docker command.
+    'docker run -d --name mongo mongo:4.4.12-rc1'
+2. Now to link the recipient with the source we use --link option while creating the docker contianer from  the build image. Now to connect the above runnning container with the name 'mongo' with our desired container we use the following command.
+    'docker run -d --link mongo <IMAGE_NAME>:<IMAGE_TAG>'
+
+-> HOW DOCKER CONTAINER LINKS WORK:
+When a container with link option is started a new entry in the '/etc/hosts' file of the running contianer is added with the name of the linked containter and the IP address of the linked continer machine. You can check the IP address of the linked container using 'docker inspect <CONTAINER_ID> | grep IP' command to validate the IP address of the linked container. 
+
+-> BENEFITS OF DOCKER CONTAINER LINKS:
+1. The main use of docker container links is when we build an application with a microservice architecture. We are able to run many independent components in different containers.
+2. Docker creates a secure tunnel between the containers that doesn't need to expose any ports externally on the container.

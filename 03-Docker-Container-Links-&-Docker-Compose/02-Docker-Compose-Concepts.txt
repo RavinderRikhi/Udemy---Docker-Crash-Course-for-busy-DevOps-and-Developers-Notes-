@@ -1,0 +1,60 @@
+-> DOCKER COMPOSE:
+Manual linking contianers & configuring services become impractical when the number of container grows. Here where 'Docker compose' comes in handy. Docker compose is a tool for defining and running multiple container docker applications. So with 'docker compose' we can define all the containers in a single YAML file. We can run a single command to run all the continers
+
+1. Docker compose is a very handy tool to quickly get docker environment up and running.
+
+2. Docker compose uses yaml files to store the configuration of all the containers, which removes the burden to maintain our scripts for docker orchestration.
+
+3. Using Compose is basically a three-step process:
+    3.1 Define your app’s environment with a Dockerfile so it can be reproduced anywhere.
+    3.2 Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
+    3.3 Run docker compose up and the Docker compose command starts and runs your entire app. You can alternatively run docker-compose up using the docker-compose binary.
+
+4. A docker-compose.yml looks like this:
+    
+    # Set docker compose version using 'version'
+    version: '3'
+    # services make up the complete application.
+    # for each service we provide instruction on how to build & run the container 
+    # our application has 2 services 1.Node Mongo Docker app & 2. Mongo db service
+    services:
+        nodemongodockerapp:
+            # The 'build' instruction defines the path to the docker file which will be used to build the docker-app image
+            # Since our 'nodemongodockerapp' Dockerfile i.e. 'Dockerfile.NodeMongoDockerApp' is sitting in the same directory as our docker-compose.yaml file we put  '.' which means the current directory 
+            build: Dockerfile.NodeMongoDockerApp .
+            # The 'ports' instruction which defines which port in the container to expose to the external network 
+            # This instruction is analogous to the -p instruction of the docker-run command
+            # The Symantic for this is <HOST_PORT>:<CONTAINER_PORT> 
+            ports:
+                - "8888:8888"
+            # The 'depends_on' instruction is used to describe the dependency of the service we are currently describing because in a micro service based architecture we want the services to start in the right order so that the app can work perfectly . Which in our case is mongo because we want the mongo container to start before the 'nodemongodockerapp' container.
+            # docker-compose will start the services in the dependency order decribed in the 'depends_on' section
+            depends_on:
+                - mongo
+        # Now we define the 'mongo' service which is created from the image pulled from the docker hub 
+        mongo:
+            # The 'image' instruction defines which image to run a container from
+            # So we have 2 options here 1. We can build an image from a Dockerfile. 2. Run a container using an existing image
+            image:
+                mongo:4.4.12-rc1
+            # We want to connect the mongo container with our mongo client software then we need to export the ports of this service to the external network.
+            ports:
+                - "27017:27017"
+
+5. The version 2 or above of docker-compose format supports 'Docker network' feature which containers to be discovered by its name 'automatically' & any service can reach any other service using the service's name so linking is not required any more.
+
+-> DOCKER COMPOSE WORKFLOW:
+
+1. To use the defined docker-compose.yaml file to build the environemt use command: 'docker-compose up -f <DOCKER_COMPOSE_FILE_PATH> -d'.
+
+2. To check the status of the containers manged by docker-compose use command: 'docker-compose ps'.
+
+3. To get the logs of all the composed manage containers use command: 'docker-compose logs'. 
+    8.1 To follow the logs as the log grows use the -f option. Like 'docker-compose logs -f'.
+    8.2 To check logs of a specific container append the container name in the end. Like 'docker-compose logs <CONTAINER_NAME|SERVICE_NAME>'.
+
+4. To stop all the runnning containers, we can go the root docker-compose file and use command: 'docker-compose stop'.
+
+5. To remove all the containers, we can go the root docker-compose file and use command: 'docker-compose rm'
+
+6. Docker-compose usually builds the images only if the image is not present. Running 'docker-compose up' 2nd time i.e. after the images are built will use the same images which were built the first time. So in case there are some new changes introduced to the Dockerfile of one of the existing image/service used by docker-compose, we need to explicitly build the new images using the command 'docker-compose build' and then to use the new images run command 'docker-compose up'.

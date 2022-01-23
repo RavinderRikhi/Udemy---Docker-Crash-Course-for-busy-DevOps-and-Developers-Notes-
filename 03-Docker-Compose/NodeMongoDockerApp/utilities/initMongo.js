@@ -10,7 +10,7 @@ const connect = async ({url='localhost', port='27017', db = '', log = console}) 
     try {
         client = new MongoClient(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
         await client.connect();
-        log.info(`Sucessfully connected to mongo: ${mongoUrl}`);
+        log.debug(`Sucessfully connected to mongo: ${mongoUrl}`);
         const myDb = client.db(db);
         return myDb;
     } catch (err) {

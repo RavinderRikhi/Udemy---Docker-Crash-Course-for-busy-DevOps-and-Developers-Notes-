@@ -19,6 +19,10 @@ services:
     # docker-compose will start the services in the dependency order decribed in the 'depends_on' section
     depends_on:
       - mongo
+    # defining networks under a service instruction basically defines the network this service can connect to
+    networks:
+      # add the list of names you want this service to connect to. In this case we are connecting to only our network 'node_mongo_docker_app_net'  
+      - node_mongo_docker_app_net  
   # Now we define the 'mongo' service which is created from the image pulled from the docker hub 
   mongo:
     # The 'image' instruction defines which image to run a container from
@@ -28,5 +32,12 @@ services:
     # We want to connect the mongo container with our mongo client software then we need to export the ports of this service to the external network.
     ports:
       - "27017:27017"
+    networks:
+      - node_mongo_docker_app_net  
+# you can define your custom network(s) under the 'networks' instruction
+networks:
+  node_mongo_docker_app_net:
+  # we can define additional configurations like driver names, etc under the network name instruction
+    driver: bridge
 
 # The version 2 or above docker-compose format supports 'Docker network' feature which containers to be discovered by its name 'automatically' & any service can reach any other service using the service's name so linking is not required any more

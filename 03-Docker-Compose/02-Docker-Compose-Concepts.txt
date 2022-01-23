@@ -1,5 +1,5 @@
 -> DOCKER COMPOSE:
-Manual linking contianers & configuring services become impractical when the number of container grows. Here where 'Docker compose' comes in handy. Docker compose is a tool for defining and running multiple container docker applications. So with 'docker compose' we can define all the containers in a single YAML file. We can run a single command to run all the continers
+Manually linking containers & configuring services become impractical when the number of container grows. Here where 'Docker compose' comes in handy. Docker compose is a tool for defining and running multiple container docker applications. So with 'docker compose' we can define all the containers in a single YAML file. We can run a single command to run all the continers
 
 1. Docker compose is a very handy tool to quickly get docker environment up and running.
 

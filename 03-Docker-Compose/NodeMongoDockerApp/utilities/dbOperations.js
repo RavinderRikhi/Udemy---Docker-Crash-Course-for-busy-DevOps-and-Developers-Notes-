@@ -21,7 +21,7 @@ class DbOperations {
             const mongoOptions = {url: this.dbUrl, port: this.dbPort, db: this.dbName};
             this.connection = await initMongo(mongoOptions);
         } else {
-            this.log.info(`Db is already connected @ ${this.getConnectionString()}`);
+            this.log.debug(`Db is already connected @ ${this.getConnectionString()}`);
         }
         return this.connection;
     }

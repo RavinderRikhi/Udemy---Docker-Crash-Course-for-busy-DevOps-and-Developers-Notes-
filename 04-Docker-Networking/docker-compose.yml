@@ -1,0 +1,26 @@
+version: '3'
+services:
+  nodemongodockerapp:
+    build: 
+      context: ../03-Docker-Container-Links-&-Docker-Compose/.
+      dockerfile: Dockerfile.NodeMongoDockerApp
+    ports:
+      - "8888:8888"
+    depends_on:
+      - mongo
+    # defining networks under a service instruction basically defines the network this service can connect to
+    networks:
+      # add the list of names you want this service to connect to. In this case we are connecting to only our network 'node_mongo_docker_app_net'  
+      - node_mongo_docker_app_net
+  mongo:
+    image:
+      mongo:4.4.12-rc1
+    ports:
+      - "27017:27017"
+    networks:
+      - node_mongo_docker_app_net
+# you can define your custom network(s) under the 'networks' instruction
+networks:
+  node_mongo_docker_app_net:
+  # we can define additional configurations like driver names, etc under the network name instruction
+    driver: bridge

@@ -1,0 +1,98 @@
+-> Docker Networking Concepts:
+
+1. Docker uses networking capabilities of the host machine operating system which is Docker's default network model. Once the Docker Demon is installed on the host machine A bridged network interface "Docker0" is provisioned on the host which will be used to bridge the traffic from the outside network to the internal containers hosted on the host machine. 
+Each continer connects to the bridged network interface. Container can connect to each other and connect to the outside world through this bridged network interface .
+
+It looks like this :
+    
+                                                                                    ==========================
+                                                                                    | Container A(With itself|
+                                                                               <==> | having private network | 
+                                                                               ||   | interface)             |
+                                                                               ||   ==========================
+    ============        ================        ============================================
+    | Internet | <====> | Host machine | <====> | Bridged network on host machine(Docker0) |
+    ============        ================        ============================================
+                                                                               ||   ==========================
+                                                                               ||   | Container B(With itself|
+                                                                               <==> | having private network |
+                                                                                    | interface)             |
+                                                                                    ===========================
+
+2. To check all the existing "Docker networks" on your machine use command :
+    -> "docker network ls". 
+
+3. To create a Docker network we use command 'docker network create --driver <DRIVER_NAME> <NETWORK_NAME>'. By default the driver used is 'bridge' representing the bridged network.
+
+4. You can also mention the docker network name while starting/creating a docker container using option '--net'. For example: 
+    -> 'docker run -d --name <CONTAINER_NAME> --net <DOCKER_NETWORK_NAME>'.
+
+5. There are 4 different types of Docker networks:
+    
+    5.1. Closed Network/None Network.
+    5.2. Bridge Network (Default network).
+    5.3. Host Network.
+    5.4. Overlay Network.
+
+    5.1 The Closed network/ None Network:
+
+        This network does not have any access to the outside world. The none network adds a continer to a 'container specific' network stack, that container lacks a container interface so it is totally isolated. This kind of a container is called a 'Closed container'. There is only one network interface which is a loop back interface is assigned to this container with IP address 127.0.0.1
+
+        To create such container use '--net none' option while creating the contianer using 'docker run' command.
+
+        Network features:
+            1. Provides a maximum level of network protection.
+            2. Not a good choice if network or internet connection is required.
+            3. Suites well where the container requires maximum level of internet security & network access is not necessary 
+
+    5.2 Bridge Network:
+
+        This is the default type of networks in Docker containers. All the containers in the same bridged network are connected to each other and they can connect to the outside world via the bridged network interface. Bridged networks are assigned a subnet mask on creation which is used to assign IPs to the containers falling under that bridge network. To find out the subnet mask of a specific 'bridged network'. We need to first find out the network name using 'docker network ls' command and then inspect the specific network using the command 'docker network inspect <NETWORK_NAME>' under the "IPAM"["Config"] key one can see the "Subnet" of that bridged network.
+
+        Say for example if the bridged network's subnet is 172.17.0.0/16 then the IP addresses assigned to the containers falling under this bridged network can range from 172.17.0.0 to 172.17.255.255.
+
+        Usually by default different bridged networks are isolated from each other. Containers from one bridged network can't access containers on the other bridged networks. But Docker has a feature which allows us to help connecting 2 or more containers on different networks, this is done via the 
+            -> "docker network connect" 
+        command. For example "docker network connect <BRIDGE_NETWORK_NAME> <CONTAINER_TO_BE_CONNECTED_NAME>". 
+        You can also disconnect continers from the bridged networks via command:
+            -> "docker network disconnect"
+        command. For example "docker network disconnect <BRIDGE_NETWORK_NAME> <CONTAINER_TO_BE_DISCONNECTED_NAME>".
+
+        Network features:
+
+            1. In a bridged network, containers have access to two network interfaces:
+                1.1. A Loopback interface(Used to connect to the processes running on same container).
+                1.2. A private interface(Used to connect to the outside network).
+            2. All containers on same bridge network can communicate with each other.
+            3. Containers from different bridge networks can't connect with each other by default.
+            4. Bridged network reduces the network isolation in favor of better outside connectivity.
+            5. Most suitable where you want to setup a relatively small network on a single host.
+
+    5.3. Host Network:
+
+        Here host network explicitly means the network related to the host machine on which the docker is installed on. Which means all of the network interfaces defined on the host will be accessible to the container. 
+
+        1. This is the least protected network model, it adds the container on the "host's network stack".
+
+        2. Containers deployed on the "host network" have full access to the "host's interface".
+
+        3. This kind of containers are usually called "Open Containers".
+        
+        To create "Open containers" use "--net host" option. For example:
+            docker run -d --name <CONTAINER_NAME> --net host <IMAGE_NAME>
+
+        Network features:
+            1. Minimum network security level.
+            2. No isolation on this type of open containers, thus leave the container widely unprotected.
+            3. Containers running in the host network stack should see a higher level of performance than those traversing the docker0 bridge and IP table port mappings.
+
+    5.4 Overlay Network:
+
+        1. Overlay network model supports multi-host networking out of the box.
+
+        2. It require some pre existing conditions before it can be created.:
+            2.1 Running docker engine in swarm mode.
+            2.2 A key-value store such as consul.
+
+
+5. Define Docker Network models with docker-compose
